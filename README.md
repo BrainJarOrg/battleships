@@ -6,11 +6,15 @@ This is the game engine for the Battleships coding challenge at [https://brainja
 ## Rules of the game
 
 
+**The goal is to destroy the enemy's fleet.**
+
+
+
 The game is played by two players. 
 
 Each player has a fleet of 4 ships of different sizes (2, 3, 4, 5) on a grid 8 x 8 (columns A-H, rows 0-7).
 
-The goal is to destroy the enemy's fleet.
+
 
 Players play in turns: in each turn they choose a cell to atack.
 
@@ -89,8 +93,7 @@ A move is represented by a JSON:
 
     {
         "move" : "C4"               // any invalid output, or shooting twice at the same cell
-                                    // will be taken as a surrender
-    }
+    }                               // will be taken as a surrender
 
 
 #### Valid turn
@@ -102,9 +105,9 @@ In a turn, player has to chose a valid location on the opponents side. Otherwise
 
 When the game starts, each player has a score (initial score = 10, minimal score = 10).
 
-Winner gets 5% of points of the looser.
+**Winner gets 5% of points of the looser.**
 
-Looser loses 5% of their points.
+**Looser loses 5% of their points.**
 
 
 ## Getting started
