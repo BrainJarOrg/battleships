@@ -1,3 +1,9 @@
+# Brainjar.org Challenges
+
+![alt text](./resources/brainjar_org_logo_200.png "Logo Brainjar.org")
+
+
+
 # Battleships 
 
 This is the game engine for the Battleships coding challenge at [https://brainjar.org/battleships](https://brainjar.org/battleships)
