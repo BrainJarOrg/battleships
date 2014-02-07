@@ -7,10 +7,12 @@ This is the game engine for the Battleships coding challenge at [https://brainja
 
 
 The game is played by two players. 
-Each player has a fleet of 4 ships of different sizes (2, 3, 4, 5) on a grid 8 x 8.
 
+Each player has a fleet of 4 ships of different sizes (2, 3, 4, 5) on a grid 8 x 8 (columns A-H, rows 0-7).
 
 The goal is to destroy the enemy's fleet.
+
+Players play in turns: in each turn they choose a cell to atack.
 
 Players can't see each other's fleet - they only know what is on the cells they have shot at.
 
@@ -72,6 +74,23 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
 #### Grid snapshots
 
 Before each move, player get the current situation - the opponent's grid's snapshot with marked fields.
+
+A snapshot is represented by a JSON:
+
+    {
+        "hit" : ["A2", "A3"],       // the cells shot at and hit
+        "missed" : ["A4", "B0"],    // the cells shot at but missed
+        "destroyed": [2]            // sizes (2, 3, 4, 5) of destroyed opponent's ships
+    }
+
+#### Move format
+
+A move is represented by a JSON:
+
+    {
+        "move" : "C4"               // any invalid output, or shooting twice at the same cell
+                                    // will be taken as a surrender
+    }
 
 
 #### Valid turn
