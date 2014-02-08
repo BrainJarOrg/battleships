@@ -97,11 +97,10 @@ A snapshot is represented by a JSON:
 
 #### Move format
 
-A move is represented by a JSON:
+A move is represented by a string (column, row)
 
     {
-        "row"    : 2,
-        "column" : 1         
+        "move" : "00       
         // any invalid output or shooting twice at the same cell will be taken as a surrender
     }
 
@@ -164,12 +163,49 @@ When the game starts, each player has a score (initial score = 10, minimal score
 
 ## Getting started
 
-To come.
+There is a little tester program, which lets you verify that the things is going ok.
+
+    git clone git@github.com:BrainJar/battleships.git
+    cd battleships
+    npm install
+    # if you don't have coffeescript installed
+    npm install -g coffee-script
+    coffee tester.coffee
+
+What you get is a loop, asking for a valid move and showing all useful data.
+
+    =====================
+     Player 0 moves
+
+    prompt: move:  00
+    Moves: ["1003","1013","1021","0003"]
+    (8,8), destroyed: 2
+    #                 
+    #                 
+    *   H   H         
+        H   H         
+        H   H         
+            H         
+                      
+          H H H H H   
+                      
+    {"hit":["00","01"],"missed":["02"],"destroyed":["2"]}
+    (8,8), destroyed: 
+    #                 
+    H                 
+        H   H         
+        H   H         
+        H   H         
+            H         
+                      
+          H H H H H   
+                      
+    {"hit":["00"],"missed":[],"destroyed":[]}
 
 
 ## Status
 
-Draft. Nothing is done yet.
+Beta. Most of the things are hacked together in one evening. Tests needed.
 
 
 ## LICENCE
