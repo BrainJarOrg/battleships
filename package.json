@@ -1,0 +1,14 @@
+{
+  "name": "Battleships",
+  "version": "0.0.0",
+  "description": "Brainjar.org - Battleships code challenge engine",
+  "main": "tester.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mikolaj Pawlikowski",
+  "license": "MIT",
+  "dependencies": {
+    "prompt": "~0.2.12"
+  }
+}

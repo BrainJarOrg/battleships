@@ -14,7 +14,7 @@ This is the game engine for the Battleships coding challenge at [https://brainja
 
 The game is played by two players. 
 
-Each player has a fleet of 4 ships of different sizes (2, 3, 4, 5) on a grid 8 x 8 (columns A-H, rows 0-7).
+Each player has a fleet of 4 ships of different sizes (2, 3, 4, 5) on a grid 8 x 8 (columns 0-7, rows 0-7).
 
 
 
@@ -30,7 +30,7 @@ Ships have to be at least one cell away from each other.
 
 Player A:
 
-        A   B   C   D   E   F   G   H
+        0   1   2   3   4   5   6   7
     0
     1           X   X   X   X
     2   X
@@ -42,7 +42,7 @@ Player A:
 
 Player B:
 
-        A   B   C   D   E   F   G   H
+        0   1   2   3   4   5   6   7
     0           X   X   X   X   X
     1
     2   X
@@ -51,6 +51,9 @@ Player B:
     5       X   X   X   X
     6                       X
     7                       X
+
+
+** Moves are stored as a couple (column, row), i.e. (3,1) is the beginning of size 4 ship of player A**
 
 ### Turns
 
@@ -62,12 +65,13 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
 
     game = new game()
 
-    game.setPlayerA(new Player())
-    game.setPlayerB(new Player())
+    game.setup(0, new Player().config)
+    game.setup(1, new Player().config)
 
     player = game.randomPlayer()
 
     while (!game.over()){
+
         turn = player.play(game.snapshot)
         if (game.isValid(turn)){
             game.apply(turn)
@@ -77,6 +81,8 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
         player = game.nextPlayer()
     }
 
+    winner = game.winner()
+
 #### Grid snapshots
 
 Before each move, player get the current situation - the opponent's grid's snapshot with marked fields.
@@ -84,8 +90,8 @@ Before each move, player get the current situation - the opponent's grid's snaps
 A snapshot is represented by a JSON:
 
     {
-        "hit" : ["A2", "A3"],       // the cells shot at and hit
-        "missed" : ["A4", "B0"],    // the cells shot at but missed
+        "hit" : ["20", "30"],       // the cells shot at and hit
+        "missed" : ["44", "01"],    // the cells shot at but missed
         "destroyed": [2]            // sizes (2, 3, 4, 5) of destroyed opponent's ships
     }
 
@@ -94,8 +100,52 @@ A snapshot is represented by a JSON:
 A move is represented by a JSON:
 
     {
-        "move" : "C4"               // any invalid output, or shooting twice at the same cell
-    }                               // will be taken as a surrender
+        "row"    : 2,
+        "column" : 1         
+        // any invalid output or shooting twice at the same cell will be taken as a surrender
+    }
+
+#### Initial config format
+
+Initial config has to follow this JSON format:
+
+    {
+        "2" :
+            {
+                "point": "00",
+                "orientation" : "vertical"   // possible values "horizontal", "vertical"
+            },
+        "3" :
+            {
+                "point": "22",
+                "orientation" : "vertical"
+            },
+        "4" :
+            {
+                "point": "42",
+                "orientation" : "vertical"
+            },
+        "5" :
+            {
+                "point": "37",
+                "orientation" : "horizontal"
+            },
+
+    }
+
+This initial config will represent
+
+
+        0   1   2   3   4   5   6   7
+    0   X
+    1   X
+    2           X       X
+    3           X       X
+    4           X       X
+    5                   X           
+    6
+    7               X   X   X   X   X
+
 
 
 #### Valid turn
