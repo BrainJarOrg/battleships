@@ -95,9 +95,9 @@ All bots have to be stateless. That's why for each move, you'll get complete gam
 
 ### Standard input and output
 
-All communication is via stdin and stdout, via JSON. 
+All communication is via command line argument and stdout, via JSON. 
 
-We'll provide you with a valid json string in stdin, and we'll expect a valid JSON string as the only thing printed to the screen.
+We'll provide you with a valid json string as an argument, and we'll expect a valid JSON string as the only thing printed to the screen.
 
 As a consequence, any errors will be considered a suicide.
 
@@ -177,7 +177,7 @@ A snapshot is represented by a JSON:
 In the array representing the sequence, (player, move, results) are encoded.
 
     player = 0|1 // player number 0 or 1
-    move   = XY  // see above
+    move   = XY  // see below
     result = 1|3 // 1 means missed, 3 means hit
 
 For example an array:
