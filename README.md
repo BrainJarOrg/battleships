@@ -90,7 +90,8 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
 
 ### Stateless, baby
 
-All bots have to be stateless. That's why for each move, you'll get complete information provided.
+All bots have to be stateless. That's why for each move, you'll get complete game information.
+
 
 ### Standard input and output
 
@@ -175,21 +176,21 @@ A snapshot is represented by a JSON:
 
 In the array representing the sequence, (player, move, results) are encoded.
 
-player = 0|1 // player number 0 or 1
-move   = XY  // see above
-result = 1|3 // 1 means missed, 3 means hit
+    player = 0|1 // player number 0 or 1
+    move   = XY  // see above
+    result = 1|3 // 1 means missed, 3 means hit
 
 For example an array:
 
     ["0001", "1003", "1113", "1331", "0123", "0133"]
 
 Represents:
-    - player 0 shoots 00 and misses
-    - player 1 shoots 00 and hits
-    - player 1 shoots 11 and hits
-    - player 1 shoots 33 and misses
-    - player 0 shoots 12 and hits
-    - player 0 shoots 13 and hits
+ - player 0 shoots 00 and misses
+ - player 1 shoots 00 and hits
+ - player 1 shoots 11 and hits
+ - player 1 shoots 33 and misses
+ - player 0 shoots 12 and hits
+ - player 0 shoots 13 and hits
 
 
 #### Move format
