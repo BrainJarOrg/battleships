@@ -83,6 +83,9 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
 
     winner = game.winner()
 
+
+## Playing the game
+
 #### Grid snapshots
 
 Before each move, player get the current situation - the opponent's grid's snapshot with marked fields.
@@ -92,17 +95,41 @@ A snapshot is represented by a JSON:
     {
         "hit" : ["20", "30"],       // the cells shot at and hit
         "missed" : ["44", "01"],    // the cells shot at but missed
-        "destroyed": [2]            // sizes (2, 3, 4, 5) of destroyed opponent's ships
+        "destroyed": [2],           // sizes (2, 3, 4, 5) of destroyed opponent's ships
+        "moves": "0001", "1003", "1113", "1331", "0123", "0133", "0143", "0151", "1711"
+                                    // an array representing the the sequence of moves and results (see later)
     }
 
 #### Move format
 
-A move is represented by a string (column, row)
+A move (as returned by the bot) is represented by a string (column, row)
 
     {
-        "move" : "00       
+        "move" : "00"
         // any invalid output or shooting twice at the same cell will be taken as a surrender
     }
+
+In the array representing the sequence, (player, move, results) are encoded.
+
+player = 0|1 // player number 0 or 1
+move   = XY  // see above
+result = 1|3 // 1 means missed, 3 means hit
+
+For example an array:
+
+    ["0001", "1003", "1113", "1331", "0123", "0133"]
+
+Represents:
+    - player 0 shoots 00 and misses
+    - player 1 shoots 00 and hits
+    - player 1 shoots 11 and hits
+    - player 1 shoots 33 and misses
+    - player 0 shoots 12 and hits
+    - player 0 shoots 13 and hits
+
+    
+
+
 
 #### Initial config format
 
@@ -128,8 +155,7 @@ Initial config has to follow this JSON format:
             {
                 "point": "37",
                 "orientation" : "horizontal"
-            },
-
+            }
     }
 
 This initial config will represent
@@ -161,7 +187,7 @@ When the game starts, each player has a score (initial score = 10, minimal score
 **Looser loses 5% of their points.**
 
 
-## Getting started
+## Getting started - tester.coffee
 
 There is a little tester program, which lets you verify that the things is going ok.
 
