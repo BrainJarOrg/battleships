@@ -234,10 +234,10 @@ There is a little tester program, which lets you verify that the things is going
 What you get is a loop, asking for a valid move and showing all useful data.
 
     =====================
-     Player 0 moves
+     Player 1 moves
 
-    prompt: move:  00
-    Moves: ["1003","1013","1021","0003"]
+    prompt: move:  02
+    Snapshot: "{\"hit\":[\"00\",\"01\"],\"missed\":[\"02\"],\"destroyed\":[\"2\"],\"moves\":[\"1003\",\"1013\",\"1021\"]}"
     (8,8), destroyed: 2
     #                 
     #                 
@@ -250,7 +250,7 @@ What you get is a loop, asking for a valid move and showing all useful data.
                       
     {"hit":["00","01"],"missed":["02"],"destroyed":["2"]}
     (8,8), destroyed: 
-    #                 
+    H                 
     H                 
         H   H         
         H   H         
@@ -259,7 +259,7 @@ What you get is a loop, asking for a valid move and showing all useful data.
                       
           H H H H H   
                       
-    {"hit":["00"],"missed":[],"destroyed":[]}
+    {"hit":[],"missed":[],"destroyed":[]}
 
 
 ## Status

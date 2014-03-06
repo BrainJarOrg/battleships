@@ -180,8 +180,8 @@ class Grid
 
         return true
 
-    # returns a JSON representation of the grid
-    toString: ->
+    # return an overview of the grid
+    summary: ->
 
         hit = []
         missed = []
@@ -199,8 +199,6 @@ class Grid
             "missed"    : missed
             "destroyed" : @destroyed
 
-        JSON.stringify data
-
     _print: ->
         # 0 - empty
         # 1 - missed
@@ -217,7 +215,7 @@ class Grid
                     when 3 then car = "#"
                 line += car + " "
             console.log line
-        console.log "#{@toString()}"
+        console.log "#{JSON.stringify(@summary())}"
 
 ###
     Class Battleships
@@ -275,7 +273,9 @@ class Battleships
 
     # get JSON representation of the current player's situation
     snapshot: ->
-        @grids[@player()].toString()
+        data = @grids[@player()].summary()
+        data.moves = @moves
+        JSON.stringify data
 
 
     # check if the game is over
@@ -338,7 +338,7 @@ class Battleships
         DEBUG
     ###
     debugPrint: ->
-        console.log "Moves: #{JSON.stringify(@moves)}"
+        console.log "Snapshot: #{JSON.stringify(@snapshot())}"
         for i in [0..1]
             @grids[i]._print()
 
