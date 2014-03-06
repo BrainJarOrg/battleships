@@ -35,7 +35,8 @@ loopy = ->
             console.log err
             return
 
-        game.play result.move
+        game.play 
+            move: result.move
 
         if not game.over()
             loopy()

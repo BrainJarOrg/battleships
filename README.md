@@ -103,7 +103,7 @@ As a consequence, any errors will be considered a suicide.
 
 
 
-### Begginning of the game
+### Beginning of the game
 
 #### Request for the init config
 

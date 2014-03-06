@@ -294,7 +294,9 @@ class Battleships
     # returns:
     #   - true if a valid move
     #   - false otherwise
-    play: (move) ->
+    play: (mv) ->
+
+        move = mv.move
 
         # check if the move is valid
         if not @grids[@opponent()].isLegal move
