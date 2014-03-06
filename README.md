@@ -75,65 +75,47 @@ If the opponnent has a ship at this location, the field is marked as "hit", and 
         turn = player.play(game.snapshot)
         if (game.isValid(turn)){
             game.apply(turn)
+            if (game.missed){
+                player = game.nextPlayer()
+            }
         } else{
             game.lost(player)
         }
-        player = game.nextPlayer()
     }
 
-    winner = game.winner()
+    return game.winner
 
 
 ## Playing the game
 
-#### Grid snapshots
 
-Before each move, player get the current situation - the opponent's grid's snapshot with marked fields.
+### Stateless, baby
 
-A snapshot is represented by a JSON:
+All bots have to be stateless. That's why for each move, you'll get complete information provided.
+
+### Standard input and output
+
+All communication is via stdin and stdout, via JSON. 
+
+We'll provide you with a valid json string in stdin, and we'll expect a valid JSON string as the only thing printed to the screen.
+
+As a consequence, any errors will be considered a suicide.
+
+
+
+### Begginning of the game
+
+#### Request for the init config
+
+The bot will receive a following JSON object.
 
     {
-        "hit" : ["20", "30"],       // the cells shot at and hit
-        "missed" : ["44", "01"],    // the cells shot at but missed
-        "destroyed": [2],           // sizes (2, 3, 4, 5) of destroyed opponent's ships
-        "moves": "0001", "1003", "1113", "1331", "0123", "0133", "0143", "0151", "1711"
-                                    // an array representing the the sequence of moves and results (see later)
+        "cmd": "init"
     }
-
-#### Move format
-
-A move (as returned by the bot) is represented by a string (column, row)
-
-    {
-        "move" : "00"
-        // any invalid output or shooting twice at the same cell will be taken as a surrender
-    }
-
-In the array representing the sequence, (player, move, results) are encoded.
-
-player = 0|1 // player number 0 or 1
-move   = XY  // see above
-result = 1|3 // 1 means missed, 3 means hit
-
-For example an array:
-
-    ["0001", "1003", "1113", "1331", "0123", "0133"]
-
-Represents:
-    - player 0 shoots 00 and misses
-    - player 1 shoots 00 and hits
-    - player 1 shoots 11 and hits
-    - player 1 shoots 33 and misses
-    - player 0 shoots 12 and hits
-    - player 0 shoots 13 and hits
-
-    
-
-
 
 #### Initial config format
 
-Initial config has to follow this JSON format:
+Initial config response has to follow this JSON format:
 
     {
         "2" :
@@ -170,6 +152,57 @@ This initial config will represent
     5                   X           
     6
     7               X   X   X   X   X
+
+
+### Moves
+
+#### Grid snapshots
+
+Before each move, player get the current situation - the opponent's grid's snapshot with marked fields.
+
+A snapshot is represented by a JSON:
+
+    {
+        "cmd": "move",              // for less user-friendly languages
+
+        // an array representing the the sequence of moves and results (see below)
+        "moves": ["0001", "1003", "1113", ...],
+
+        // for your convenience, we also suply the following data
+        "hit"       : ["20", "30"],  // the cells shot at and hit
+        "missed"    : ["44", "01"],  // the cells shot at but missed
+        "destroyed" : [2]            // sizes (2, 3, 4, 5) of destroyed opponent's ships
+    }
+
+In the array representing the sequence, (player, move, results) are encoded.
+
+player = 0|1 // player number 0 or 1
+move   = XY  // see above
+result = 1|3 // 1 means missed, 3 means hit
+
+For example an array:
+
+    ["0001", "1003", "1113", "1331", "0123", "0133"]
+
+Represents:
+    - player 0 shoots 00 and misses
+    - player 1 shoots 00 and hits
+    - player 1 shoots 11 and hits
+    - player 1 shoots 33 and misses
+    - player 0 shoots 12 and hits
+    - player 0 shoots 13 and hits
+
+
+#### Move format
+
+A move (as returned by the bot) is represented by a string (column, row).
+
+A following JSON has to be returned for a bot to play a move.
+
+    {
+        "move" : "00"
+        // any invalid output or shooting twice at the same cell will be taken as a surrender
+    }
 
 
 
@@ -231,7 +264,7 @@ What you get is a loop, asking for a valid move and showing all useful data.
 
 ## Status
 
-Beta. Most of the things are hacked together in one evening. Tests needed.
+Beta. Most of the things are hacked together in few evening. Contributions welcome !
 
 
 ## LICENCE
