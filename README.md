@@ -26,7 +26,6 @@ Players can't see each other's fleet - they only know what is on the cells they 
 ### Initial setting
 
 At the beginning, each player is choosing their setting - they have to place 4 ships on the grid.
-Ships have to be at least one cell away from each other.
 
 Player A:
 
