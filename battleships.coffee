@@ -275,7 +275,18 @@ class Battleships
     snapshot: ->
         data = @grids[@player()].summary()
         data.moves = @moves
+        data.cmd = "move"
         JSON.stringify data
+
+    # get the string to send to the bot
+    getBotCommand: ->
+        init = JSON.stringify
+            cmd: init
+        player = "#{@player()}"
+        for move in @moves
+            if player is move.charAt(0)
+                return @snapshot()
+        return init
 
 
     # check if the game is over
