@@ -230,7 +230,7 @@ class Battleships
 
     # game finished due to illegal move
     illegalMove: false
-    setup: false
+    set: false
 
     # current player
     currentPlayer : Math.round(Math.random())
@@ -269,23 +269,24 @@ class Battleships
             @won = 0
             return false
         #console.log JSON.stringify @grids
+        @set = true
         return true
 
 
     # get JSON representation of the current player's situation
     snapshot: ->
-        data = @grids[@player()].summary()
+        data = @grids[@opponent()].summary()
         data.moves = @moves
         data.cmd = "move"
         JSON.stringify data
 
     # get the string to send to the bot
     getBotCommand: ->
-        if not @setup
+        if not @set
             return JSON.stringify
                 cmd: 'init'
-                
-        return @snapshot()
+        else
+            return @snapshot()
 
 
     # check if the game is over
@@ -342,13 +343,17 @@ class Battleships
             out += ":" + move
         out
 
+    export: (start) ->
+        data =
+            'winner': @winner()
+            'moves': @moves
+            'elapsed': (start - process.hrtime())
 
 
     ### 
         DEBUG
     ###
     debugPrint: ->
-        console.log "Snapshot: #{JSON.stringify(@snapshot())}"
         for i in [0..1]
             @grids[i]._print()
 
