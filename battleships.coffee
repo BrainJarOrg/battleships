@@ -230,6 +230,7 @@ class Battleships
 
     # game finished due to illegal move
     illegalMove: false
+    setup: false
 
     # current player
     currentPlayer : Math.round(Math.random())
@@ -280,13 +281,11 @@ class Battleships
 
     # get the string to send to the bot
     getBotCommand: ->
-        init = JSON.stringify
-            cmd: init
-        player = "#{@player()}"
-        for move in @moves
-            if player is move.charAt(0)
-                return @snapshot()
-        return init
+        if not @setup
+            return JSON.stringify
+                cmd: 'init'
+                
+        return @snapshot()
 
 
     # check if the game is over
