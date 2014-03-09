@@ -247,13 +247,11 @@ class Battleships
         (@currentPlayer + 1) % 2
 
     # grids storing the config of users grids
-    grids : [
-        new Grid(8, 8)
-        new Grid(8, 8)
-    ]
+    grids : []
+    configs :[]
 
     # moves:
-    #   <player><move><effect><destroyed>,
+    #   <player><move><effect>,
     #       - player    (1)     = 0|1
     #       - move      (2)     = xy, where x,y in <0,9>
     #       - effect    (1)     = 1|3 (missed|hit)
@@ -262,6 +260,19 @@ class Battleships
 
     # initialize the grid with provided config
     setup: (configA, configB) ->
+
+        # reset
+        @grids = [
+                new Grid(8, 8)
+                new Grid(8, 8)
+            ]
+        @configs = []
+        @illegalMove = false
+        @set = false
+        @currentPlayer = Math.round(Math.random())
+        @moves = []
+
+        # setup
         if not @grids[0].setup configA
             @won = 1
             return false
@@ -269,6 +280,9 @@ class Battleships
             @won = 0
             return false
         #console.log JSON.stringify @grids
+        @configs.push configA
+        @configs.push configB
+
         @set = true
         return true
 
@@ -343,12 +357,12 @@ class Battleships
             out += ":" + move
         out
 
-    export: (start) ->
+    export: (elapsed) ->
         data =
             'winner': @winner()
             'moves': @moves
-            'elapsed': (start - process.hrtime())
-
+            'elapsed': elapsed
+            'config': @configs
 
     ### 
         DEBUG

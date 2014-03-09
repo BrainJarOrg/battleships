@@ -4,6 +4,10 @@
 
 This is the game engine for the Battleships coding challenge at [https://brainjar.org/battleships](https://brainjar.org/battleships)
 
+## Bots
+
+This repos provides basic info about the game. If you want to see an example of a working bot to get you started, check this out: https://github.com/BrainJar/battleships-bot
+
 
 ## Rules of the game
 
