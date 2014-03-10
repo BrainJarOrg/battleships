@@ -56,7 +56,7 @@ Player B:
     7                       X
 
 
-** Moves are stored as a couple (column, row), i.e. (3,1) is the beginning of size 4 ship of player A**
+** Moves are stored as a couple (column, row), i.e. (2,1) is the beginning of size 4 ship of player A**
 
 ### Turns
 
@@ -169,7 +169,7 @@ A snapshot is represented by a JSON:
     {
         "cmd": "move",              // for less user-friendly languages
 
-        // an array representing the the sequence of moves and results (see below)
+        // an array representing the sequence of moves and results (see below)
         "moves": ["0001", "1003", "1113", ...],
 
         // for your convenience, we also suply the following data
