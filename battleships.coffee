@@ -242,6 +242,7 @@ class Battleships
 
         err = @grids[@opponent()].setup configA
         if err
+            @_changePlayer()
             return {
                 error: "The following configuration of the opponent was rejected"
                 data : err.error
