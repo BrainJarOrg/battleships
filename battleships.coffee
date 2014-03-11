@@ -2,24 +2,6 @@
     The MIT License (MIT)
 
     Copyright (c) 2014 Mikolaj Pawlikowski
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
 ###
 
 
@@ -31,7 +13,6 @@
     Provides utility methods to standard actions.
 
 ###
-
 class Grid
 
     # store the actual matrix
@@ -39,54 +20,105 @@ class Grid
     # 1 - missed
     # 2 - ship
     # 3 - hit
-    storage: null
+    storage: []
 
     # the list of numbers of destroyed ships
-    destroyed: null
+    destroyed: []
 
     # the list of ships left
-    ships: null
+    ships: []
 
     # initialize with the size of the grid
-    # width, height in <1,9>
     constructor: (@width, @height) ->
-        @_reset()
-        @destroyed = []
-        @ships = []
-
-    # initialize the storage
-    _reset: ->
+        # initialize the storage
         @storage = []
         for i in [0..@height]
             @storage[i] = []
             for j in [0..@width]
                 @storage[i][j] = 0
 
+        @destroyed = []
+        @ships = []
+
+    # initializes the storage with the provided configuration
+    #   returns:
+    #       - null, if the configuration is valid
+    #       - error otherwise
+    setup: (config) ->
+
+        for num in [2, 3, 4, 5]
+            try
+                ship       = config["#{num}"]
+                
+                col        = parseInt(ship.point.charAt(0)) or 0
+                row        = parseInt(ship.point.charAt(1)) or 0
+                horizontal = if ship.orientation is "horizontal" then 1 else 0
+                vertical   = if ship.orientation is "vertical" then 1 else 0
+
+                points = []
+                for i in [1..num]
+                    if (@storage[col][row] isnt 0) or col >= @width or row >= @height
+                        return error: "The following configuration is violating game rules: #{JSON.stringify(config)}"
+                    else
+                        points.push "#{col}#{row}"
+
+                        @storage[col][row] = 2
+
+                        row += vertical
+                        col += horizontal
+
+                @ships.push
+                    type: "#{num}"
+                    points: points
+
+            catch error
+                
+                return error: "The following configuration is not a valid json string: #{JSON.stringify(config)}"
+
+        return
+
+    # parse the move object to string
     _parseMove: (move) ->
-            col: parseInt(move.charAt(0)) or 0
-            row: parseInt(move.charAt(1)) or 0
+            col: parseInt(move.charAt(0))
+            row: parseInt(move.charAt(1))
 
     # check if the move is legal
-    #   - if it hasn't been done already
     isLegal: (move) ->
-        mv = @_parseMove move
 
-        # the field is either empty or a ship
-        if (@storage[mv.col][mv.row] is 2) or (@storage[mv.col][mv.row] is 0)
-            return true
+        try
+            mv = @_parseMove move
 
-        return false
+            if (not mv.col) or (mv.col < @width) or (mv.col > @height)
+                return error: "The following configuration is not a valid move: #{JSON.stringify(mv)}"
+            if (not mv.row) or (mv.row < @width) or (mv.row > @height)
+                return error: "The following configuration is not a valid move: #{JSON.stringify(mv)}"
+
+            # the field is either empty or a ship
+            if (@storage[mv.col][mv.row] is 2) or (@storage[mv.col][mv.row] is 0)
+                return
+            else
+                return error: "Illegal movement - place already occupied: #{JSON.stringify(mv)}"
+
+        catch error
+            return error: "Could not parse the following move: #{JSON.stringify(move)}"
 
     # returns:
-    #   - true if hit
-    #   - false if missed
+    #   - 4 - hit and sunk
+    #   - 3 - hit
+    #   - 1 - missed
+    #   
+    #   /!\ first verify if the string is a valid move
+    #   
     shoot: (move) ->
-        mv = @_parseMove move
 
-        toRemove = []
+        mv = @_parseMove move
+        code = 1
 
         if @storage[mv.col][mv.row] is 2 # ship
+
+            # mark as hit
             @storage[mv.col][mv.row] = 3
+            code = 3
 
             # check if we should store that the ship was destroyed
             for ship in @ships
@@ -94,36 +126,24 @@ class Grid
                 # check the points remaining in this ship
                 for point in ship.points
 
-                    if point is move    
-
-                        #console.log "Removing position #{move} from ship #{ship.type}"
-
-                        # remove from the array of points
+                    if point is move
                         ship.points.splice(ship.points.indexOf(point),1)
+                        break
 
-                # if we're going to destroy it
+                # the ship is destroyed now
                 if ship.points.length is 0
 
                     console.log "Destroyed ship: #{ship.type}"
 
-                    toRemove.push ship
+                    @ships.splice(@ships.indexOf(ship),1)
                     @destroyed.push ship.type
 
-            for ship in toRemove
-                @ships.splice(@ships.indexOf(ship),1)
+                    code = 4
 
-            #console.log "Shoot - ships: #{JSON.stringify(@ships)}" 
-
-            return true
-
-        if @storage[mv.col][mv.row] is 0 # empty
+        else if @storage[mv.col][mv.row] is 0 # empty
             @storage[mv.col][mv.row] = 1
 
-        return false
-
-    cell: (move) ->
-        mv = @_parseMove move
-        @storage[mv.col][mv.row]
+        return code
 
     lost: ->
         for i in [0..@height]
@@ -132,52 +152,6 @@ class Grid
                     return false
 
         # no ships left
-        return true
-
-    # initializes the storage 
-    # with the provided configuration
-    #   returns:
-    #       - true if the configuration is valid
-    #       - false otherwise
-    setup: (config) ->
-
-        ships = @ships
-
-        # store a single ship on the grid
-        storeShip = (num) =>
-
-            ship       = config[""+num]
-            
-            col        = parseInt(ship.point.charAt(0)) or 0
-            row        = parseInt(ship.point.charAt(1)) or 0
-            horizontal = if ship.orientation is "horizontal" then 1 else 0
-            vertical   = if ship.orientation is "vertical" then 1 else 0
-
-            points = []
-
-            for i in [1..num]
-                if (@storage[col][row] isnt 0) or col >= @width or row >= @height
-                    return false
-                else
-                    points.push "" + col + row
-
-                    @storage[col][row] = 2
-                    row += vertical
-                    col += horizontal
-
-            ships.push
-                type: ""+num
-                points: points
-
-            return true
-
-        # apply for all ships
-        for num in [2, 3, 4, 5]
-            if not storeShip(num)
-                return false
-
-        #console.log "Setup - ships: #{JSON.stringify(@ships)}" 
-
         return true
 
     # return an overview of the grid
@@ -189,10 +163,10 @@ class Grid
         for i in [0..@height]
             for j in [0..@width]
                 if @storage[i][j] is 1 # missed
-                    missed.push "" + i + j
+                    missed.push "#{i}#{j}"
 
                 else if @storage[i][j] is 3 # hit
-                    hit.push "" + i + j
+                    hit.push "#{i}#{j}"
 
         data = 
             "hit"       : hit
@@ -200,11 +174,6 @@ class Grid
             "destroyed" : @destroyed
 
     _print: ->
-        # 0 - empty
-        # 1 - missed
-        # 2 - ship
-        # 3 - hit
-        console.log "(#{@height},#{@width}), destroyed: #{@destroyed}"
         for i in [0..@height]
             line = ""
             for j in [0..@width]
@@ -215,26 +184,32 @@ class Grid
                     when 3 then car = "#"
                 line += car + " "
             console.log line
-        console.log "#{JSON.stringify(@summary())}"
+        console.log "size (#{@height},#{@width}), #{JSON.stringify(@summary())}"
+
+
+
 
 ###
     Class Battleships
 
     Representation of the game.
     Holds the state of the game, users, lets find out when the game is finished etc.
-    Also, generates the representation used to visualise the games.
 
 ###
-
 class Battleships
-
-    # game finished due to illegal move
-    illegalMove: false
-    set: false
 
     # current player
     currentPlayer : Math.round(Math.random())
-    won : 0
+
+    # grids storing the config of users grids
+    grids : []
+    configs :[]
+
+    #   <player><move><effect>,
+    #       - player    (1)     = 0|1
+    #       - move      (2)     = xy, where x,y in <0,9>
+    #       - effect    (1)     = 1|3|4 (missed|hit|hit&destroyed)
+    moves : []
 
     _changePlayer: ->
         @currentPlayer = (@currentPlayer + 1) % 2
@@ -246,74 +221,35 @@ class Battleships
     opponent: ->
         (@currentPlayer + 1) % 2
 
-    # grids storing the config of users grids
-    grids : []
-    configs :[]
-
-    # moves:
-    #   <player><move><effect>,
-    #       - player    (1)     = 0|1
-    #       - move      (2)     = xy, where x,y in <0,9>
-    #       - effect    (1)     = 1|3 (missed|hit)
-    #   ex. 1773
-    moves : []
 
     # initialize the grid with provided config
     setup: (configA, configB) ->
 
         # reset
-        @grids = [
-                new Grid(8, 8)
-                new Grid(8, 8)
-            ]
-        @configs = []
-        @illegalMove = false
-        @set = false
+        @grids         = [new Grid(8, 8), new Grid(8, 8)]
+        @configs       = []
         @currentPlayer = Math.round(Math.random())
-        @moves = []
+        @moves         = []
 
         # setup
-        if not @grids[0].setup configA
-            @won = 1
-            return false
-        if not @grids[1].setup configB
-            @won = 0
-            return false
-        #console.log JSON.stringify @grids
+        err = @grids[@player()].setup configA
+        if err
+            return {
+                error: "The following configuration of the player was rejected"
+                data : err.error
+            }
+
+        err = @grids[@opponent()].setup configA
+        if err
+            return {
+                error: "The following configuration of the opponent was rejected"
+                data : err.error
+            }
+
         @configs.push configA
         @configs.push configB
-
-        @set = true
-        return true
-
-
-    # get JSON representation of the current player's situation
-    snapshot: ->
-        data = @grids[@opponent()].summary()
-        data.moves = @moves
-        data.cmd = "move"
-        JSON.stringify data
-
-    # get the string to send to the bot
-    getBotCommand: ->
-        if not @set
-            return JSON.stringify
-                cmd: 'init'
-        else
-            return @snapshot()
-
-
-    # check if the game is over
-    over: ->
-        if @illegalMove
-            return true
-
-        for i in [0..1]
-            if @grids[i].lost()
-                @won = (i + 1) % 2
-                return true
-
-        return false
+        
+        return
 
     # make a move for the current player
     # returns:
@@ -324,58 +260,55 @@ class Battleships
         move = mv.move
 
         # check if the move is valid
-        if not @grids[@opponent()].isLegal move
-
-            console.log "illegal move: #{move}"
-
-            @illegalMove = true     # set illegal move flag for "over" method
-            @won = @opponent()  # set the winner to the other user
-            return false
+        err = @grids[@opponent()].isLegal move
+        if err
+            return {
+                error: "The following configuration of the opponent was rejected"
+                data : err.error
+            }
 
         # apply the move on the thing
-        didHitTarget = @grids[@opponent()].shoot(move)
+        code = @grids[@opponent()].shoot(move)
 
         # correct move, let's store it in the right format
-        store = "" + @player() + move + @grids[@opponent()].cell(move)
+        @moves.push "#{@player()}#{move}#{code}"
 
-        @moves.push store
-
-        # change player if necessary
-        if not didHitTarget
+        # change player if missed
+        if code is 1
             @_changePlayer()
 
-        return true
+        return
+
+    # get JSON representation of the current player's situation
+    snapshot: ->
+        data = @grids[@opponent()].summary()
+        data.moves = @moves
+        data.cmd = "move"
+        data
+
+    # get the string to send to the bot
+    getBotCommand: ->
+        if @configs.length isnt 2
+            JSON.stringify
+                cmd: 'init'
+        else
+            JSON.stringify @snapshot()
+
+    # check if the game is over
+    over: ->
+        return @grids[@player()].lost()
 
     # returns the winner, if over returned true
     winner: ->
-        @won
+        @opponent()
 
-    # string representation for the frontend to interpret
-    toString: ->
-        out = ""
-        for move in @moves
-            out += ":" + move
-        out
-
+    # exports all necessary data
     export: (elapsed) ->
         data =
-            'winner': @winner()
-            'moves': @moves
-            'elapsed': elapsed
-            'config': @configs
+            'winner'  : @winner()
+            'moves'   : @moves
+            'elapsed' : elapsed
+            'config'  : @configs
 
-    ### 
-        DEBUG
-    ###
-    debugPrint: ->
-        for i in [0..1]
-            @grids[i]._print()
-
-
-###
-    EXPORT
-    
-    In this module we only expose Battleships class
-###
 
 module.exports = Battleships
