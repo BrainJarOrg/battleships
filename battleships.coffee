@@ -57,7 +57,7 @@ class Grid
 
                 points = []
                 for i in [1..num]
-                    if (@storage[col][row] isnt 0) or col >= @width or row >= @height
+                    if (@storage[col][row] isnt 0)  or  (col >= @width or col <0)  or  (row >= @height or row < 0)
                         return error: "The following configuration is violating game rules: #{JSON.stringify(config)}"
                     else
                         points.push "#{col}#{row}"
@@ -73,7 +73,7 @@ class Grid
 
             catch error
                 
-                return error: "The following configuration is not a valid json string: #{JSON.stringify(config)}"
+                return error: "The following configuration is not a valid json string: #{JSON.stringify(config)} (#{error.toString()})"
 
         return
 
@@ -88,16 +88,16 @@ class Grid
         try
             mv = @_parseMove move
 
-            if (not mv.col) or (mv.col < @width) or (mv.col > @height)
+            if (mv.col < 0) or (mv.col >= @width)
                 return error: "The following configuration is not a valid move: #{JSON.stringify(mv)}"
-            if (not mv.row) or (mv.row < @width) or (mv.row > @height)
+            if (mv.row < 0) or (mv.row >= @height)
                 return error: "The following configuration is not a valid move: #{JSON.stringify(mv)}"
 
             # the field is either empty or a ship
             if (@storage[mv.col][mv.row] is 2) or (@storage[mv.col][mv.row] is 0)
                 return
             else
-                return error: "Illegal movement - place already occupied: #{JSON.stringify(mv)}"
+                return error: "Illegal movement - cell already occupied: #{JSON.stringify(mv)}"
 
         catch error
             return error: "Could not parse the following move: #{JSON.stringify(move)}"
@@ -120,7 +120,7 @@ class Grid
             @storage[mv.col][mv.row] = 3
             code = 3
 
-            # check if we should store that the ship was destroyed
+            # check if we should store that the ship was 
             for ship in @ships
 
                 # check the points remaining in this ship
@@ -137,6 +137,7 @@ class Grid
 
                     @ships.splice(@ships.indexOf(ship),1)
                     @destroyed.push ship.type
+                    break
 
                     code = 4
 
@@ -184,7 +185,7 @@ class Grid
                     when 3 then car = "#"
                 line += car + " "
             console.log line
-        console.log "size (#{@height},#{@width}), #{JSON.stringify(@summary())}"
+        #console.log "size (#{@height},#{@width}), #{JSON.stringify(@summary())}"
 
 
 
@@ -263,7 +264,7 @@ class Battleships
         err = @grids[@opponent()].isLegal move
         if err
             return {
-                error: "The following configuration of the opponent was rejected"
+                error: "The following move of the opponent was rejected"
                 data : err.error
             }
 
@@ -309,6 +310,11 @@ class Battleships
             'moves'   : @moves
             'elapsed' : elapsed
             'config'  : @configs
-
+    ### 
+        DEBUG
+    ###
+    _print: ->
+        for i in [0..1]
+            @grids[i]._print()
 
 module.exports = Battleships
