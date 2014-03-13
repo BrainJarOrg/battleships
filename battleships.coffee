@@ -233,14 +233,14 @@ class Battleships
         @moves         = []
 
         # setup
-        err = @grids[@player()].setup configA
+        err = @grids[0].setup configA
         if err
             return {
                 error: "The following configuration of the player was rejected"
                 data : err.error
             }
 
-        err = @grids[@opponent()].setup configA
+        err = @grids[1].setup configB
         if err
             @_changePlayer()
             return {
@@ -298,7 +298,7 @@ class Battleships
 
     # check if the game is over
     over: ->
-        return @grids[@player()].lost()
+        return @grids[@player()].lost() or @grids[@opponent()].lost()
 
     # returns the winner, if over returned true
     winner: ->
