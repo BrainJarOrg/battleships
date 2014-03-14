@@ -275,8 +275,9 @@ class Battleships
         # correct move, let's store it in the right format
         @moves.push "#{@player()}#{move}#{code}"
 
-        # change player if missed
-        if code is 1
+
+        # if game finished or missed
+        if @grids[@opponent()].destroyed.length is 4 or code is 1
             @_changePlayer()
 
         return
