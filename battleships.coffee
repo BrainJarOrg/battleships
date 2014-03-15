@@ -287,6 +287,7 @@ class Battleships
         data = @grids[@opponent()].summary()
         data.moves = @moves
         data.cmd = "move"
+        data.you = @player()
         data
 
     # get the string to send to the bot

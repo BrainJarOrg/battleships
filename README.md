@@ -180,7 +180,8 @@ A snapshot is represented by a JSON:
         // for your convenience, we also suply the following data
         "hit"       : ["20", "30"],  // the cells shot at and hit
         "missed"    : ["44", "01"],  // the cells shot at but missed
-        "destroyed" : [2]            // sizes (2, 3, 4, 5) of destroyed opponent's ships
+        "destroyed" : [2],           // sizes (2, 3, 4, 5) of destroyed opponent's ships
+        "you"       : 0              // player 0 or 1
     }
 
 In the array representing the sequence, (player, move, results) are encoded.
