@@ -137,9 +137,10 @@ class Grid
 
                     @ships.splice(@ships.indexOf(ship),1)
                     @destroyed.push ship.type
-                    break
-
+                    
                     code = 4
+                    
+                    break
 
         else if @storage[mv.col][mv.row] is 0 # empty
             @storage[mv.col][mv.row] = 1
